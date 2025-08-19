@@ -1,12 +1,22 @@
+const dotenv = require('dotenv');
+dotenv.config();
+
 const express = require('express');
 const cors = require('cors');
-const dotenv = require('dotenv');
-const db = require('./db'); // Ensure db.js exists and is correct
-const authRoutes = require('./routes/authRoutes'); // Make sure path is correct
+
+const db = require('./db'); 
+const authRoutes = require('./routes/authRoutes'); 
+const paymentRoutes = require('./routes/paymentRoutes');
+const orderRoutes = require('./routes/orderRoutes'); 
+const adminRoutes = require('./routes/adminRoutes');
 
 dotenv.config();
 
 const app = express();
+
+// ⚠️ increase limits for screenshots (tune as needed)
+app.use(express.json({ limit: '80mb' }));
+app.use(express.urlencoded({ limit: '80mb', extended: true }));
 
 app.use(cors({
   origin: 'http://localhost:5173',
@@ -19,6 +29,12 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api/auth', authRoutes);
+
+
+app.use('/api/checkout', paymentRoutes); // -> POST /api/checkout/create-intent
+app.use('/api/orders', orderRoutes); 
+app.use('/api/admin', adminRoutes);
+
 
 const PORT = process.env.PORT || 5050;
 app.listen(PORT, () => {
